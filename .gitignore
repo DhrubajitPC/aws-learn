@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+# terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+tf.plan
+plan.json
+plan.txt
+crash.log
+.terraform.lock.hcl.bak
