@@ -251,12 +251,17 @@ code {
   color: #8C97A2; text-transform: uppercase;
 }
 .code-top .path { text-transform: none; letter-spacing: .02em; color: #A7B3BE; }
-.copy {
+.code-btns { display: flex; gap: .3rem; flex: 0 0 auto; }
+.copy, .wrapbtn {
   font-family: var(--mono); font-size: .6rem; letter-spacing: .08em; text-transform: uppercase;
   background: transparent; color: #8C97A2; border: 1px solid var(--code-rule);
   padding: .2rem .45rem; border-radius: 3px; cursor: pointer; flex: 0 0 auto;
+  white-space: nowrap;
 }
-.copy:hover { color: #DCE1DA; border-color: #4A545E; }
+.copy:hover, .wrapbtn:hover { color: #DCE1DA; border-color: #4A545E; }
+.wrapbtn[aria-pressed="true"] {
+  color: #CFE0F5; border-color: #4B6A93; background: rgba(135, 169, 220, .16);
+}
 .code pre {
   margin: 0; padding: .85rem .9rem; overflow-x: auto;
   font-family: var(--mono); font-size: .765rem; line-height: 1.62;
@@ -386,7 +391,7 @@ details.qa[open] > summary { border-bottom: 1px solid var(--rule-soft); }
 .pill.paid { background: var(--oxide-wash); color: var(--oxide); }
 
 /* ── controls that only exist on small screens ───────────────── */
-.menu-btn, .wrap-btn, .scrim, .readbar { display: none; }
+.menu-btn, .scrim, .readbar { display: none; }
 
 .drawer-head {
   display: none;
@@ -419,13 +424,53 @@ details.qa[open] > summary { border-bottom: 1px solid var(--rule-soft); }
 }
 .tw, .code pre, .flow { -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
 
-/* Wrap long lines instead of scrolling sideways. Toggled from the app bar;
-   invaluable for reading Terraform on a 375px screen. */
+/* Wrap long lines instead of scrolling sideways. Default on small screens,
+   toggled per reader from any code header. */
 body.wrap-code .code pre {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  background-image: none;
+  background-image: none;   /* scroll shadows are meaningless once wrapped */
 }
+
+/* Each source line becomes a block, in BOTH modes. Keeping it block when
+   unwrapped means no newline text nodes are needed in the DOM, which is what
+   stops innerText emitting a blank line between every line. */
+.code pre .cl { display: block; }
+.code pre .cl:empty { min-height: 1.6em; min-height: 1lh; }
+
+/* Hanging indent, wrapped mode only.
+
+   A fixed indent is not good enough for code: a continuation of a line nested
+   eight levels deep would jump to the left margin and read like a new
+   top-level statement. Instead each line carries an .iN class for its own
+   leading-space count, so a continuation sits two columns deeper than the
+   line it belongs to. Same behaviour as VS Code's wrappingIndent: indent. */
+body.wrap-code .code pre .cl { padding-left: 2ch; text-indent: -2ch; }
+body.wrap-code .code pre .i0 { padding-left: 2ch; text-indent: -2ch; }
+body.wrap-code .code pre .i1 { padding-left: 3ch; text-indent: -3ch; }
+body.wrap-code .code pre .i2 { padding-left: 4ch; text-indent: -4ch; }
+body.wrap-code .code pre .i3 { padding-left: 5ch; text-indent: -5ch; }
+body.wrap-code .code pre .i4 { padding-left: 6ch; text-indent: -6ch; }
+body.wrap-code .code pre .i5 { padding-left: 7ch; text-indent: -7ch; }
+body.wrap-code .code pre .i6 { padding-left: 8ch; text-indent: -8ch; }
+body.wrap-code .code pre .i7 { padding-left: 9ch; text-indent: -9ch; }
+body.wrap-code .code pre .i8 { padding-left: 10ch; text-indent: -10ch; }
+body.wrap-code .code pre .i9 { padding-left: 11ch; text-indent: -11ch; }
+body.wrap-code .code pre .i10 { padding-left: 12ch; text-indent: -12ch; }
+body.wrap-code .code pre .i11 { padding-left: 13ch; text-indent: -13ch; }
+body.wrap-code .code pre .i12 { padding-left: 14ch; text-indent: -14ch; }
+body.wrap-code .code pre .i13 { padding-left: 15ch; text-indent: -15ch; }
+body.wrap-code .code pre .i14 { padding-left: 16ch; text-indent: -16ch; }
+body.wrap-code .code pre .i15 { padding-left: 17ch; text-indent: -17ch; }
+body.wrap-code .code pre .i16 { padding-left: 18ch; text-indent: -18ch; }
+body.wrap-code .code pre .i17 { padding-left: 19ch; text-indent: -19ch; }
+body.wrap-code .code pre .i18 { padding-left: 20ch; text-indent: -20ch; }
+body.wrap-code .code pre .i19 { padding-left: 21ch; text-indent: -21ch; }
+body.wrap-code .code pre .i20 { padding-left: 22ch; text-indent: -22ch; }
+body.wrap-code .code pre .i21 { padding-left: 23ch; text-indent: -23ch; }
+body.wrap-code .code pre .i22 { padding-left: 24ch; text-indent: -24ch; }
+body.wrap-code .code pre .i23 { padding-left: 25ch; text-indent: -25ch; }
+body.wrap-code .code pre .i24 { padding-left: 26ch; text-indent: -26ch; }
 
 @media (max-width: 1080px) {
   :root { --rail-w: 16.5rem; }
@@ -444,14 +489,6 @@ body.wrap-code .code pre {
     border: 1px solid var(--rule); border-radius: 7px; cursor: pointer;
   }
   .menu-btn:active { background: var(--surface-2); }
-
-  .wrap-btn {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 42px; height: 42px; padding: 0; font-size: .95rem;
-  }
-  .wrap-btn[aria-pressed="true"] {
-    background: var(--accent-wash); color: var(--accent-ink); border-color: var(--accent);
-  }
 
   .drawer-head { display: flex; }
 
@@ -635,8 +672,6 @@ body.wrap-code .code pre {
             aria-label="Open sprint menu" aria-expanded="false" aria-controls="rail">☰</button>
     <span class="crumb"><span class="crumb-word">Sprint </span><b id="crumb">00 · AWS foundations</b></span>
     <span class="pager">
-      <button class="wrap-btn" id="wrapBtn" type="button" aria-pressed="false"
-              title="Wrap long code lines" aria-label="Wrap long code lines">↵</button>
       <button id="prev" type="button">← Prev</button>
       <button id="next" type="button">Next →</button>
     </span>
@@ -9114,7 +9149,9 @@ echo "    --query 'ResourceTagMappingList[].ResourceARN'"</code></pre>
     var btn = e.target.closest ? e.target.closest('.copy') : null;
     if (!btn) { return; }
     var pre = btn.closest('.code').querySelector('pre');
-    var text = pre.innerText;
+    // Not innerText: it is CSS-aware and adds a newline per block-level line
+    // span. The Map holds the pre-split original for line-wrapped blocks.
+    var text = rawCode.get(pre) || pre.textContent;
     var done = function () {
       var old = btn.textContent;
       btn.textContent = 'Copied';
@@ -9309,16 +9346,90 @@ echo "    --query 'ResourceTagMappingList[].ResourceARN'"</code></pre>
     }, { passive: true });
   })();
 
-  /* ── wrap-code toggle: read Terraform without sideways scrolling ── */
-  var wrapBtn = document.getElementById('wrapBtn');
-  var wrapOn = false;
-  try { wrapOn = localStorage.getItem('idp-manual-wrap') === '1'; } catch (e) {}
+  /* ── code wrapping ─────────────────────────────────────────────
+     Default ON below 860px, because horizontal scrolling through
+     Terraform on a phone is unusable. An explicit choice is remembered
+     and beats the default from then on. */
+  var wrapOn;
+  var wrapStored = null;
+  try { wrapStored = localStorage.getItem('idp-manual-wrap'); } catch (e) {}
+  if (wrapStored === '1' || wrapStored === '0') {
+    wrapOn = wrapStored === '1';
+  } else {
+    wrapOn = window.matchMedia('(max-width: 860px)').matches;
+  }
+
   function applyWrap() {
     document.body.classList.toggle('wrap-code', wrapOn);
-    wrapBtn.setAttribute('aria-pressed', wrapOn ? 'true' : 'false');
-    try { localStorage.setItem('idp-manual-wrap', wrapOn ? '1' : '0'); } catch (e) {}
+    Array.prototype.forEach.call(document.querySelectorAll('.wrapbtn'), function (b) {
+      b.setAttribute('aria-pressed', wrapOn ? 'true' : 'false');
+      b.textContent = wrapOn ? 'Wrap ✓' : 'Wrap';
+    });
+    if (wrapOn) { splitLines(document.querySelector('.sprint.on')); }
   }
-  wrapBtn.addEventListener('click', function () { wrapOn = !wrapOn; applyWrap(); });
+
+  /* Split each source line into its own block-level span so the hanging
+     indent in CSS has something to hang off. Done lazily per section: doing
+     all 86 blocks up front costs time nobody asked for. textContent is
+     preserved exactly, so copy still returns the original bytes. */
+  var rawCode = new Map();
+
+  function splitLines(scope) {
+    if (!scope) { return; }
+    Array.prototype.forEach.call(scope.querySelectorAll('.code pre > code'), function (code) {
+      if (code.dataset.split === '1') { return; }
+      // Stash the exact source before rewriting the DOM. Held in a Map
+      // rather than a data attribute so the page weight does not double.
+      rawCode.set(code.closest('pre'), code.textContent);
+
+      var lines = code.textContent.split('\n');
+      var frag = document.createDocumentFragment();
+      for (var i = 0; i < lines.length; i++) {
+        var span = document.createElement('span');
+        // Indent level drives which hanging-indent rule applies. Capped at 24
+        // because past that the continuation would push off a phone screen.
+        var lead = lines[i].length - lines[i].replace(/^ +/, '').length;
+        span.className = 'cl i' + Math.min(lead, 24);
+        span.textContent = lines[i];
+        frag.appendChild(span);
+      }
+      code.textContent = '';
+      code.appendChild(frag);
+      code.dataset.split = '1';
+    });
+  }
+
+  /* A labelled control in every code header. The previous single glyph in
+     the app bar was not discoverable — put the affordance on the thing it
+     affects. */
+  Array.prototype.forEach.call(document.querySelectorAll('.code-top'), function (top) {
+    var copy = top.querySelector('.copy');
+    if (!copy) { return; }
+    var group = document.createElement('span');
+    group.className = 'code-btns';
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'wrapbtn';
+    btn.setAttribute('aria-pressed', 'false');
+    btn.title = 'Wrap long lines instead of scrolling sideways';
+    btn.textContent = 'Wrap';
+    btn.addEventListener('click', function () {
+      wrapOn = !wrapOn;
+      try { localStorage.setItem('idp-manual-wrap', wrapOn ? '1' : '0'); } catch (e) {}
+      applyWrap();
+    });
+    top.replaceChild(group, copy);
+    group.appendChild(btn);
+    group.appendChild(copy);
+  });
+
+  // Split the newly shown section too, when wrapping is active.
+  var _showWrap = show;
+  show = function (id, push) {
+    _showWrap(id, push);
+    if (wrapOn) { splitLines(document.getElementById(id)); }
+  };
+
   applyWrap();
 
   /* ── reading progress for the active sprint ── */
