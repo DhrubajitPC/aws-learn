@@ -34,6 +34,7 @@
 
   --rail-w: 19rem;
   --measure: 74ch;
+  --content-max: 62rem;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -171,19 +172,30 @@ a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visibl
 
 /* ───────────────────────── main ───────────────────────── */
 main { flex: 1 1 auto; min-width: 0; padding: 0 0 6rem; }
-.pad { padding: 0 clamp(1.2rem, 4vw, 4rem); }
+.pad {
+  padding: 0 clamp(1.2rem, 4vw, 4rem);
+  /* Centre within the space left of the rail. On a widescreen monitor the
+     content was pinned to the far left with ~1,000px of dead space beside it. */
+  max-width: var(--content-max);
+  margin-inline: auto;
+}
 .col { max-width: var(--measure); }
 .wide { max-width: min(100%, 96ch); }
 
 .topbar {
   position: sticky; top: 0; z-index: 20;
-  display: flex; justify-content: space-between; align-items: center; gap: 1rem;
   padding: .7rem clamp(1.2rem, 4vw, 4rem);
   background: color-mix(in srgb, var(--paper) 88%, transparent);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--rule);
   font-family: var(--mono); font-size: .68rem; color: var(--ink-faint);
   letter-spacing: .06em; text-transform: uppercase;
+}
+/* Bar chrome stays full-bleed; its contents align with the article column. */
+.bar-inner {
+  display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+  max-width: var(--content-max);
+  margin-inline: auto;
 }
 .topbar .crumb b { color: var(--ink); font-weight: 600; }
 .pager { display: flex; gap: .4rem; }
@@ -472,6 +484,17 @@ body.wrap-code .code pre .i22 { padding-left: 24ch; text-indent: -24ch; }
 body.wrap-code .code pre .i23 { padding-left: 25ch; text-indent: -25ch; }
 body.wrap-code .code pre .i24 { padding-left: 26ch; text-indent: -26ch; }
 
+/* Above ~1600px there is room to widen the column slightly and grow the
+   prose measure, which stops the text looking like a narrow ribbon stranded
+   in the middle of a large display. */
+@media (min-width: 1600px) {
+  :root { --content-max: 68rem; --measure: 78ch; }
+}
+@media (min-width: 2100px) {
+  :root { --rail-w: 21rem; --content-max: 72rem; }
+  body { font-size: 17.5px; }
+}
+
 @media (max-width: 1080px) {
   :root { --rail-w: 16.5rem; }
   .rail nav a { font-size: .72rem; }
@@ -520,10 +543,10 @@ body.wrap-code .code pre .i24 { padding-left: 26ch; text-indent: -26ch; }
 
   /* app bar */
   .topbar {
-    gap: .45rem;
     padding: .45rem max(.85rem, env(safe-area-inset-right)) .45rem max(.85rem, env(safe-area-inset-left));
     padding-top: max(.45rem, env(safe-area-inset-top));
   }
+  .bar-inner { gap: .45rem; }
   .crumb {
     flex: 1 1 auto; min-width: 0; font-size: .6rem;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
@@ -668,13 +691,15 @@ body.wrap-code .code pre .i24 { padding-left: 26ch; text-indent: -26ch; }
 
 <main>
   <div class="topbar">
-    <button class="menu-btn" id="menuBtn" type="button"
-            aria-label="Open sprint menu" aria-expanded="false" aria-controls="rail">☰</button>
-    <span class="crumb"><span class="crumb-word">Sprint </span><b id="crumb">00 · AWS foundations</b></span>
-    <span class="pager">
-      <button id="prev" type="button">← Prev</button>
-      <button id="next" type="button">Next →</button>
-    </span>
+    <div class="bar-inner">
+      <button class="menu-btn" id="menuBtn" type="button"
+              aria-label="Open sprint menu" aria-expanded="false" aria-controls="rail">☰</button>
+      <span class="crumb"><span class="crumb-word">Sprint </span><b id="crumb">00 · AWS foundations</b></span>
+      <span class="pager">
+        <button id="prev" type="button">← Prev</button>
+        <button id="next" type="button">Next →</button>
+      </span>
+    </div>
     <div class="readbar" id="readbar" aria-hidden="true"></div>
   </div>
 
